@@ -1,8 +1,3 @@
-/* Snake Game using C++ 
-developed by TheKittyKat, 
-improved by Nazim Nazari 
-December 2017 */
-
 #include <iostream>
 #include <vector>
 #include <cstdlib> // For rand() and srand()
@@ -86,14 +81,14 @@ void initMap() {
     headxpos = mapWidth / 2;
     headypos = mapHeight / 2;
     direction = 0;
-    // Place the food
-    generateFood();
     // Fill the map
     for (int i = 0; i < mapSize; ++i) {
         map[i] = 0;
     }
     // Set the head position
-    map[headypos * mapWidth + headxpos] = -1;
+    map[headypos * mapWidth + headxpos] = food;
+    // Place the first piece of food
+    generateFood();
 }
 
 // Print the map to the console
@@ -125,10 +120,10 @@ void clearScreen() {
 // Change the direction of the snake
 void changeDirection(int key) {
     switch (key) {
-        case KEY_UP: direction = 0; break;
-        case KEY_RIGHT: direction = 1; break;
-        case KEY_DOWN: direction = 2; break;
-        case KEY_LEFT: direction = 3; break;
+        case KEY_UP: if (direction != 2) direction = 0; break;
+        case KEY_RIGHT: if (direction != 3) direction = 1; break;
+        case KEY_DOWN: if (direction != 0) direction = 2; break;
+        case KEY_LEFT: if (direction != 1) direction = 3; break;
     }
 }
 
@@ -144,37 +139,27 @@ void moveSnake(int dx, int dy) {
     }
     
     // Check if the snake hits itself
-    if (map[newy * mapWidth + newx] != 0 && map[newy * mapWidth + newx] != -2) {
+    if (map[newy * mapWidth + newx] > 0) {
         running = false;
         return;
     }
-    
+
     // Check if the snake eats the food
     if (map[newy * mapWidth + newx] == -2) {
-    food++;
-    generateFood();
-} else {
-    // Move the snake head
-    headxpos = newx;
-    headypos = newy;
-    map[headypos * mapWidth + headxpos] = -1;
-
-    // Update the rest of the snake body
-    for (int i = 0; i < mapSize; ++i) {
-        if (map[i] > 0) map[i]--;
+        food++;
+        generateFood();
+    } else {
+        // Move the rest of the snake body
+        for (int i = 0; i < mapSize; ++i) {
+            if (map[i] > 0) map[i]--;
+        }
     }
-    map[headypos * mapWidth + headxpos] = food;
 
-}
     // Move the snake head
     headxpos = newx;
     headypos = newy;
-    map[headypos * mapWidth + headxpos] = -1;
     
-    // Update the rest of the snake body
-    for (int i = 0; i < mapSize; ++i) {
-        if (map[i] > 0) map[i]--;
-    }
+    // Set new head position
     map[headypos * mapWidth + headxpos] = food;
 }
 
