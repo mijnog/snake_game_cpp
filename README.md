@@ -8,6 +8,6 @@ Or simply:
 
     make
 
-Make sure ncurses is installed on your system!
+Make sure ncurses is installed on your system:
 
     sudo apt install libncurses-dev
