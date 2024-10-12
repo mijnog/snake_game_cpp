@@ -6,4 +6,4 @@ To compile:
 
 Make sure ncurses is installed on your system!
 
-    sudo apt-get install libncurses-dev
+    sudo apt install libncurses-dev
