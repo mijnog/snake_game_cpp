@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <cstdlib> // For rand() and srand()
 #include <ctime>   // For time()
 #include <ncurses.h>
@@ -139,45 +138,33 @@ void changeDirection(int key) {
 }
 
 // Move the snake in the given direction
-bool isInForgivenessState = false;  // Whether the snake is in a forgiveness state
-int forgivenessCount = 0;           // How many game loops the snake has been in the forgiveness state
-
 void moveSnake(int dx, int dy) {
     int newx = headxpos + dx;
     int newy = headypos + dy;
 
-    // If snake is in forgiveness state, don't move and wait for the next loop
-    if (isInForgivenessState) {
-        forgivenessCount--;
-        if (forgivenessCount <= 0) {
-            isInForgivenessState = false;  // Reset forgiveness state after one loop
-        }
-        return;  // Return early to skip moving the snake
-    }
-
     // Check if the snake hits the wall
     if (newx < 0 || newx >= mapWidth || newy < 0 || newy >= mapHeight || map[newy * mapWidth + newx] == WALL) {
-        isInForgivenessState = true;  // Activate forgiveness state
-        forgivenessCount = 1;  // Snake will stay still for 1 loop
-        return;  // Return early, not allowing movement
+        running = false; // End the game if the snake hits a wall
+        return;
     }
 
-    // Check if the snake hits itself
+    // Check if the snake hits itself (excluding the head's position)
     if (map[newy * mapWidth + newx] > 0) {
-        isInForgivenessState = true;  // Activate forgiveness state
-        forgivenessCount = 1;  // Snake will stay still for 1 loop
-        return;  // Return early, not allowing movement
+        running = false; // End the game if the snake hits its own body
+        return;
     }
 
     // Check if the snake eats the food
     if (map[newy * mapWidth + newx] == -2) {
         food++;
         score += 10; // Increase score by 10
-        generateFood();
+        generateFood(); // Generate new food
     } else {
-        // Move the rest of the snake body
+        // Move the snake body
         for (int i = 0; i < mapSize; ++i) {
-            if (map[i] > 0) map[i]--;
+            if (map[i] > 0) {
+                map[i]--; // Move the body forward
+            }
         }
     }
 
@@ -186,7 +173,7 @@ void moveSnake(int dx, int dy) {
     headypos = newy;
 
     // Set new head position
-    map[headypos * mapWidth + headxpos] = food;
+    map[headypos * mapWidth + headxpos] = food; // Set head in new position
 }
 
 // Update the game state
@@ -205,6 +192,6 @@ void generateFood() {
     do {
         x = rand() % mapWidth;
         y = rand() % mapHeight;
-    } while (map[y * mapWidth + x] != 0);
-    map[y * mapWidth + x] = -2;
+    } while (map[y * mapWidth + x] != 0); // Make sure the food doesn't spawn on top of the snake
+    map[y * mapWidth + x] = -2; // Place food
 }
